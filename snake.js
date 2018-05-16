@@ -2,7 +2,10 @@ const NROWS = 10;
 const NCOLS = 10;
 
 const snake = [[1, 1], [1, 2], [1, 3]]
+const pellets = [[4, 4]]
+
 let snakeDirection = "LEFT"
+let timerId;
 
 /** createBoard: creates board, giving each cell a unique id of "r__c__" */
 
@@ -17,6 +20,13 @@ function createBoard() {
       row.appendChild(cell)
     }
     board.appendChild(row)
+  }
+}
+
+function showPellets() {
+  for ([y, x] of pellets) {
+    id = `r${y}c${x}`
+    document.getElementById(id).style.backgroundColor = "yellow";
   }
 }
 
@@ -60,27 +70,48 @@ function moveSnake(direction) {
     }
   }
 
-  console.log(`new old x=${x} y=${y}`)
+  console.log(`new x=${x} y=${y}`)
 
-  // add new head & remove tail
+  // add new head
   snake.unshift([y, x])
-  snake.pop()
+
+  // if we didn't just eat a pellet, remove tail
+  const matchPelletId = pellets.findIndex(p => p[0] === y && p[1] === x)
+  if (matchPelletId === -1) {
+    snake.pop()
+  } else {
+    pellets.splice(matchPelletId, 1)
+  }
 }
 
 function readKey(evt) {
+  window.clearTimeout(timerId)
+  timerId = window.setTimeout(hitTimer, 1000)
+
   console.log("evt.code=", evt.code)
   if (evt.code === "ArrowLeft" && snakeDirection !== "RIGHT") snakeDirection = "LEFT"
   if (evt.code === "ArrowRight" && snakeDirection !== "LEFT") snakeDirection = "RIGHT"
   if (evt.code === "ArrowUp" && snakeDirection !== "DOWN") snakeDirection = "UP"
   if (evt.code === "ArrowDown" && snakeDirection !== "UP") snakeDirection = "DOWN"
 
-  console.log("direction=", snakeDirection)
+  console.log("direction=", snakeDirection, Math.random())
   drawSnake("white")
   moveSnake(snakeDirection)
   drawSnake("red")
 }
 
+function hitTimer() {
+  drawSnake("white")
+  moveSnake(snakeDirection);
+  drawSnake("red")
+
+  timerId = window.setTimeout(hitTimer, 1000)
+}
+
+
+
 createBoard();
+showPellets();
 drawSnake("red");
 
 document.addEventListener("keydown", readKey);
