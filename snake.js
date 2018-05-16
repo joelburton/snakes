@@ -31,7 +31,7 @@ function drawSnake(color) {
 function moveSnake(direction) {
   // get location of head of snake
   let [y, x] = snake[0]
-  console.log(`x=${x} y=${y}`)
+  console.log(`old x=${x} y=${y}`)
   console.log(snake);
 
   switch (direction) {
@@ -59,6 +59,8 @@ function moveSnake(direction) {
       throw new Error(`crashed into self x=${x} y=${y} currX=${currX} currY=${currY}`)
     }
   }
+
+  console.log(`new old x=${x} y=${y}`)
 
   // add new head & remove tail
   snake.unshift([y, x])

@@ -1,0 +1,5 @@
+#board td {
+  border: solid 1px black;
+  width: 1em;
+  height: 1em;
+}
