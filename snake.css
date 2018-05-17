@@ -1,12 +1,27 @@
+/* center game board */
+
+body, html {
+  height: 100%;
+  display: grid;
+}
+
+#game { 
+  margin: auto;
+}
+
+/* board: tighten spacing, add borders */
+
+#board {
+  border-collapse: collapse;
+}
+
 #board td {
   border: solid 1px black;
   width: 1.5em;
   height: 1.5em;
 }
 
-#board {
-  border-collapse: collapse;
-}
+/* cell colors */
 
 .snake { 
   background-color: red;
