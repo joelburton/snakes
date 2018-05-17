@@ -1,38 +1,36 @@
 const NROWS = 10;
 const NCOLS = 10;
 
-const snake = [[1, 1], [1, 2], [1, 3]]
-const pellets = [[4, 4]]
+const snake = [{ y: 1, x: 1 }, { y: 1, x: 2 }, { y: 1, x: 3 }]
+const pellets = []
 
 let snakeDirection = "LEFT"
 let timerId;
 
 /** createBoard: creates board, giving each cell a unique id of "r__c__" */
 
+function getIdForYX(y, x) {
+  return `r${y}c${x}`;
+}
+
 function createBoard() {
   const board = document.getElementById("board")
 
-  for (let rowi = 0; rowi < NROWS; rowi++) {
+  for (let y = 0; y < NROWS; y++) {
     const row = document.createElement("tr")
-    for (let coli = 0; coli < NCOLS; coli++) {
+    for (let x = 0; x < NCOLS; x++) {
       const cell = document.createElement("td")
-      cell.id = `r${rowi}c${coli}`
+      cell.id = getIdForYX(y, x)
       row.appendChild(cell)
     }
     board.appendChild(row)
   }
 }
 
-function showPellets() {
-  for ([y, x] of pellets) {
-    id = `r${y}c${x}`
-    document.getElementById(id).style.backgroundColor = "yellow";
-  }
-}
-
 function drawSnake(color) {
-  for ([row, col] of snake) {
-    const id = `r${row}c${col}`;
+  console.log(snake);
+  for ({ y, x } of snake) {
+    const id = getIdForYX(y, x)
     const cell = document.getElementById(id)
     cell.style.backgroundColor = color;
   }
@@ -40,7 +38,7 @@ function drawSnake(color) {
 
 function moveSnake(direction) {
   // get location of head of snake
-  let [y, x] = snake[0]
+  let { y, x } = snake[0]
   console.log(`old x=${x} y=${y}`)
   console.log(snake);
 
@@ -64,23 +62,40 @@ function moveSnake(direction) {
     throw new Error("crashed into wall")
   }
 
-  for ([currY, currX] of snake) {
-    if (y === currY && x === currX) {
-      throw new Error(`crashed into self x=${x} y=${y} currX=${currX} currY=${currY}`)
+  for (cell of snake) {
+    if (y === cell.y && x === cell.x) {
+      throw new Error(`crashed into self x=${x} y=${y} currX=${cell.x} currY=${cell.y}`)
     }
   }
 
   console.log(`new x=${x} y=${y}`)
 
   // add new head
-  snake.unshift([y, x])
+  snake.unshift({ y, x })
 
   // if we didn't just eat a pellet, remove tail
-  const matchPelletId = pellets.findIndex(p => p[0] === y && p[1] === x)
+  const matchPelletId = pellets.findIndex(p => (p.y === y) && (p.x === x))
   if (matchPelletId === -1) {
     snake.pop()
   } else {
     pellets.splice(matchPelletId, 1)
+    addPellet();
+  }
+}
+
+function addPellet() {
+  while (true) {
+    const x = Math.floor(Math.random() * NCOLS);
+    const y = Math.floor(Math.random() * NROWS);
+    const existingPelletAtLocation = pellets.find(p => (p.y === y) && (p.x === x))
+    const existingSnakeCellAtLocation = snake.find(c => (c.y === y) && (c.x === x))
+
+    if (!existingPelletAtLocation && !existingPelletAtLocation) {
+      pellets.push({ y, x })
+      id = getIdForYX(y, x)
+      document.getElementById(id).style.backgroundColor = "yellow";
+      return;
+    }
   }
 }
 
@@ -111,7 +126,12 @@ function hitTimer() {
 
 
 createBoard();
-showPellets();
+
+for (let i = 0; i < 5; i++) {
+  addPellet();
+}
+
+
 drawSnake("red");
 
 document.addEventListener("keydown", readKey);
